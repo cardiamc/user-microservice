@@ -40,8 +40,12 @@ EP_DICT = {
 
     # telebot.py
     # Bot register
-    '061': (400, 'Username and telegram chat id are required for this operation'),
-    '062': (404, 'User with the requested username does not exist')
+    '101': (400, 'Username and telegram chat id are required for this operation'),
+    '102': (404, 'User with the requested username does not exist'),
+
+    # auth.py
+    # Login
+    '201': (400, 'Wrong username or password')
 }
 
 

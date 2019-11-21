@@ -1,9 +1,7 @@
-from flask import Blueprint, abort
-from flask import jsonify, redirect, render_template, request
-from flask_jwt import jwt_required, current_identity
+from flask import Blueprint, jsonify, request
+import flask_jwt_extended as jwt
 
 from service.models import db, User
-from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
 import re
@@ -15,7 +13,7 @@ users = Blueprint('users', __name__)
 BP_ID = 0
 
 @users.route('/users', methods=['GET'])
-@jwt_required
+@jwt.jwt_required
 def users_(func_id=0):
     '''
     Provides the list of all the users.
@@ -28,7 +26,7 @@ def users_(func_id=0):
 
 
 @users.route('/users/<user_id>', methods=['GET'])
-@jwt_required
+@jwt.jwt_required
 def get_user(user_id, func_id=1):
     '''
     Opens the wall of the user with id <user_id>.
@@ -126,7 +124,7 @@ def signup(func_id=2):
 
 
 @users.route('/users/<user_id>/follow', methods=['POST'])
-@jwt_required
+@jwt.jwt_required
 def follow(user_id, func_id=3):
     '''
     Follows the user with id <user_id>. 
@@ -134,7 +132,7 @@ def follow(user_id, func_id=3):
     Returns:
         200 -> user followed successfully
     '''
-    follower = current_identity['id']
+    follower = jwt.get_jwt_identity()['id']
     followee = int(user_id)
     if follower == followee:
         return errors.response(f'{BP_ID}{func_id}1')
@@ -155,7 +153,7 @@ def follow(user_id, func_id=3):
 
 
 @users.route('/users/<user_id>/follow', methods=['DELETE'])
-@jwt_required
+@jwt.jwt_required
 def unfollow(user_id, func_id=4):
     '''
     Unfollows the user with id <user_id>. 
@@ -163,7 +161,7 @@ def unfollow(user_id, func_id=4):
     Returns:
         200 -> user unfollowed successfully
     '''
-    follower = current_identity['id']
+    follower = jwt.get_jwt_identity()['id']
     followee = int(user_id)
     if follower == followee:
         return errors.response(f'{BP_ID}{func_id}1')
@@ -184,7 +182,7 @@ def unfollow(user_id, func_id=4):
 
 
 @users.route('/followed', methods=['GET'])
-@jwt_required
+@jwt.jwt_required
 def get_followed(func_id=5):
     '''
     Gets the list of the current user's followers.
@@ -192,6 +190,6 @@ def get_followed(func_id=5):
     Returns:
         200 -> the list has been returned correctly
     '''
-    me = User.query.get(current_identity['id'])
+    me = User.query.get(jwt.get_jwt_identity()['id'])
     users = [x.to_dict() for x in me.follows]
     return jsonify({'users': users}), 200

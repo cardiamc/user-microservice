@@ -9,8 +9,8 @@ BP_ID = 1
 
 @telebot.route('/bot/register', methods=['POST'])
 def bot_register(func_id=0):
-    username = request.form.get('username')
-    chat_id = request.form.get('chat_id')
+    username = request.args.get('username')
+    chat_id = request.args.get('chat_id')
 
     if username is None or chat_id is None:
         return errors.response(f'{BP_ID}{func_id}1')

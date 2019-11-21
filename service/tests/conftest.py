@@ -5,6 +5,7 @@ import datetime
 import json
 import pytest
 
+import flask_jwt_extended as jwt
 from service.models import User, db
 from service.app import create_app
 
@@ -93,6 +94,40 @@ def database(app):
         db.session.commit()
 
 
+@pytest.fixture('class')
+def jwt_token(app):
+
+    class JWTActions():
+
+        def create_token(self, identity, refresh=False, max_age=None):
+            with app.app_context():
+                if refresh:
+                    return jwt.create_refresh_token(identity,
+                                                    expires_delta=max_age)
+                return jwt.create_access_token(identity,
+                                               expires_delta=max_age)
+
+        def set_token(self, response, token, refresh=False):
+            with app.app_context():
+                if refresh:
+                    jwt.set_refresh_cookies(response, token)
+                else:
+                    jwt.set_access_cookies(response, token)
+
+        def token_headers(self, identity, refresh=False, max_age=None):
+            with app.app_context():
+                token = self.create_token(identity, max_age=max_age)
+                res = jsonify({})
+                self.set_token(res, token)
+                if refresh:
+                    token = self.create_token(
+                        identity, refresh=True, max_age=max_age)
+                    self.set_token(res, token, refresh=True)
+                return res.headers['Set-Cookie']
+
+    return JWTActions()
+
+
 @pytest.fixture(scope='class')
 def users():
 
@@ -151,7 +186,31 @@ def telebot():
 
         def register(self, username, chat_id):
             assert self.client is not None
+            qstring = '?'
+            if username is not None:
+                qstring = f'{qstring}username={username}&'
+            if chat_id is not None:
+                qstring = f'{qstring}chat_id={chat_id}&'
+
             return self.client.post(
-                f'/bot/register?username={username}&chat_id={chat_id}'
+                f'/bot/register{qstring[:-1]}'
             )
     return TelebotActions()
+
+
+@pytest.fixture(scope='class')
+def auth():
+
+    class AuthActions:
+
+        def __init__(self):
+            self.client = None
+
+        def login(self, data):
+            assert self.client is not None
+            return self.client.post(
+                '/login',
+                json=json.dumps(data)
+            )
+
+    return AuthActions()
