@@ -5,6 +5,7 @@ import datetime
 import json
 import pytest
 
+from flask import jsonify
 import flask_jwt_extended as jwt
 from service.models import User, db
 from service.app import create_app
@@ -22,7 +23,7 @@ def app():
     os.unlink(db_path)
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture
 def client_factory(app):
 
     class ClientFactory:
@@ -36,7 +37,7 @@ def client_factory(app):
     return ClientFactory(app)
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture
 def client(app, client_factory):
     return client_factory.get()
 
@@ -78,7 +79,7 @@ def _init_database(db):
     db.session.commit()
 
 
-@pytest.fixture
+@pytest.fixture(scope='class')
 def database(app):
     '''
     Provides a reference to the temporary database in the app context. Use
@@ -94,7 +95,7 @@ def database(app):
         db.session.commit()
 
 
-@pytest.fixture('class')
+@pytest.fixture(scope='class')
 def jwt_token(app):
 
     class JWTActions():
@@ -136,14 +137,20 @@ def users():
         def __init__(self):
             self.client = None
 
-        def get_users(self):
+        def all_users(self, token):
             assert self.client is not None
+            if token is not None:
+                self.client.set_cookie(
+                    'localhost', 'access_token_cookie', token)
             return self.client.get(
                 '/users'
             )
         
-        def get_user(self, user_id):
+        def get_user(self, token, user_id):
             assert self.client is not None
+            if token is not None:
+                self.client.set_cookie(
+                    'localhost', 'access_token_cookie', token)
             return self.client.get(
                 f'/users/{user_id}'
             )
@@ -153,22 +160,32 @@ def users():
             return self.client.post(
                 '/signup',
                 data=json.dumps(data),
-                content_type='application/json')
+                content_type='application/json'
+            )
         
-        def follow(self, user_id):
+        def follow(self, token, user_id):
             assert self.client is not None
+            if token is not None:
+                self.client.set_cookie(
+                    'localhost', 'access_token_cookie', token)
             return self.client.post(
                 f'/users/{user_id}/follow'
             )
         
-        def unfollow(self, user_id):
+        def unfollow(self, token, user_id):
             assert self.client is not None
+            if token is not None:
+                self.client.set_cookie(
+                    'localhost', 'access_token_cookie', token)
             return self.client.delete(
                 f'/users/{user_id}/follow'
             )
 
-        def get_followed(self):
+        def get_followed(self, token):
             assert self.client is not None
+            if token is not None:
+                self.client.set_cookie(
+                    'localhost', 'access_token_cookie', token)
             return self.client.get(
                 '/followed'
             )

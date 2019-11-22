@@ -22,7 +22,8 @@ def users_(func_id=0):
         200 -> the list has been provided successfully
     '''
     users = User.query.all()
-    return jsonify({'users': [u.to_dict for u in users]}), 200
+
+    return jsonify({'users': [u.to_dict() for u in users]}), 200
 
 
 @users.route('/users/<user_id>', methods=['GET'])
@@ -54,10 +55,10 @@ def signup(func_id=2):
     params = request.get_json()
 
     if len(params) > 6:
-        return 
+        return errors.response(f'{BP_ID}{func_id}1')
 
     if not all(x in params for x in ['email', 'username', 'password']):
-        return 
+        return errors.response(f'{BP_ID}{func_id}2')
 
     new_user = User()
 
@@ -100,14 +101,14 @@ def signup(func_id=2):
             if len(lastname) <= 64:
                 new_user.lastname = lastname
             else:
-                err_code = 7
+                err_code = 6
                 break
 
         elif k == 'dateofbirth':
             new_user.dateofbirth = params[k]
         
         else:
-            err_code = 8
+            err_code = 7
             break
 
     if err_code is not None:
@@ -116,9 +117,12 @@ def signup(func_id=2):
     db.session.add(new_user)
     try:
         db.session.commit()
-    except IntegrityError:
+    except IntegrityError as e:
         db.session.rollback()
-        return errors.response(f'{BP_ID}{func_id}9')
+        if 'user.username' in str(e):
+            return errors.response(f'{BP_ID}{func_id}8')
+        if 'user.email' in str(e):
+            return errors.response(f'{BP_ID}{func_id}9')
 
     return jsonify({}), 200
 
