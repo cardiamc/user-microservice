@@ -2,7 +2,7 @@ import json
 import datetime as dt
 from service.models import User
 
-MOCK_TOKEN_IDENTITY = {'user_id': 1,
+MOCK_TOKEN_IDENTITY = {'id': 1,
                        'username': 'test1', 'password': 'test1123'}
 
 class TestAllUsers:
@@ -37,7 +37,7 @@ class TestGetUser:
         assert reply.status_code == 200
 
         get_user_res = User.query.get(2).to_dict()
-        assert reply.json == get_user_res
+        assert reply.json['user'] == get_user_res
     
     def test_get_user_no_user(self, app, client, users, database, jwt_token):
         users.client = client
@@ -189,6 +189,22 @@ class TestSignup:
         assert reply.status_code == 400
         assert reply.json['code'] == 'EUS026'
     
+    def test_signup_wrong_dateofbirth(self, app, client, users, database):
+        users.client = client
+
+        data = {
+            'username': 'test4',
+            'email': 'test4@example.com',
+            'password': 'test4123',
+            'firstname': 'First4',
+            'lastname': 'Last4',
+            'dateofbirth': 'wrongdate'
+        }
+
+        reply = users.signup(data)
+        assert reply.status_code == 400
+        assert reply.json['code'] == 'EUS027'
+    
     def test_signup_wrong_param(self, app, client, users, database):
         users.client = client
 
@@ -203,39 +219,39 @@ class TestSignup:
 
         reply = users.signup(data)
         assert reply.status_code == 400
-        assert reply.json['code'] == 'EUS027'
+        assert reply.json['code'] == 'EUS028'
     
     def test_signup_username_exists(self, app, client, users, database):
         users.client = client
 
         data = {
             'username': 'test1',
-            'email': 'test4@example.com',
+            'email': 'test5@example.com',
             'password': 'test4123',
             'firstname': 'First4',
             'lastname': 'Last4',
-            'wrongparam?': 'Yep, wrong'
+            'dateofbirth': '2020-10-5'
         }
 
         reply = users.signup(data)
         assert reply.status_code == 409
-        assert reply.json['code'] == 'EUS028'
+        assert reply.json['code'] == 'EUS029U'
     
     def test_signup_email_exists(self, app, client, users, database):
         users.client = client
 
         data = {
-            'username': 'test4',
+            'username': 'test5',
             'email': 'test1@example.com',
             'password': 'test4123',
             'firstname': 'First4',
             'lastname': 'Last4',
-            'wrongparam?': 'Yep, wrong'
+            'dateofbirth': '2020-10-5'
         }
 
         reply = users.signup(data)
         assert reply.status_code == 409
-        assert reply.json['code'] == 'EUS029'
+        assert reply.json['code'] == 'EUS029E'
 
 
 class TestFollow:
@@ -263,7 +279,7 @@ class TestFollow:
         token = jwt_token.create_token(MOCK_TOKEN_IDENTITY)
 
         reply = users.follow(token, 180)
-        assert reply.status_code == 400
+        assert reply.status_code == 404
         assert reply.json['code'] == 'EUS032'
     
     def test_follow_already_following(self, app, client, users, database, jwt_token):
@@ -289,7 +305,7 @@ class TestUnfollow:
         users.client = client
         
         token = jwt_token.create_token(MOCK_TOKEN_IDENTITY)
-
+        users.follow(token, 2)
         reply = users.unfollow(token, 2)
         assert reply.status_code == 200
 
@@ -308,7 +324,7 @@ class TestUnfollow:
         token = jwt_token.create_token(MOCK_TOKEN_IDENTITY)
 
         reply = users.unfollow(token, 180)
-        assert reply.status_code == 400
+        assert reply.status_code == 404
         assert reply.json['code'] == 'EUS042'
 
     def test_follow_not_following_yet(self, app, client, users, database, jwt_token):
@@ -324,4 +340,27 @@ class TestUnfollow:
         users.client = client
 
         reply = users.unfollow(None, 2)
+        assert reply.status_code == 401
+
+
+class TestFollowed:
+
+    def test_followed_success(self, app, client, users, database, jwt_token):
+        users.client = client
+
+        token = jwt_token.create_token(MOCK_TOKEN_IDENTITY)
+        users.follow(token, 2)
+
+        me = User.query.get(1)
+        followed_users = [x.to_dict() for x in me.follows]
+        assert followed_users != []
+
+        reply = users.get_followed(token)
+        assert reply.status_code == 200
+        assert reply.json['followed_users'] == followed_users
+    
+    def test_followed_no_token(self, app, client, users, database, jwt_token):
+        users.client = client
+
+        reply = users.get_followed(None)
         assert reply.status_code == 401

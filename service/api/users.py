@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 import re
 
 from service.utility import errors
+import datetime as dt
 
 users = Blueprint('users', __name__)
 
@@ -36,11 +37,11 @@ def get_user(user_id, func_id=1):
         200 -> the user's wall with the list of all his/her posted stories
     '''
     
-    user = User.query.get(user_id).to_dict()
+    user = User.query.get(user_id)
     if user is None:
         return errors.response(f'{BP_ID}{func_id}1')
     
-    return jsonify({'user': user}), 200
+    return jsonify({'user': user.to_dict()}), 200
 
 
 @users.route('/signup', methods=['POST'])
@@ -105,10 +106,13 @@ def signup(func_id=2):
                 break
 
         elif k == 'dateofbirth':
-            new_user.dateofbirth = params[k]
-        
+            try:
+                new_user.dateofbirth = dt.datetime.strptime(params[k], f'%Y-%m-%d')
+            except ValueError:
+                err_code = 7
+                break
         else:
-            err_code = 7
+            err_code = 8
             break
 
     if err_code is not None:
@@ -119,10 +123,11 @@ def signup(func_id=2):
         db.session.commit()
     except IntegrityError as e:
         db.session.rollback()
+        print(e)
         if 'user.username' in str(e):
-            return errors.response(f'{BP_ID}{func_id}8')
+            return errors.response(f'{BP_ID}{func_id}9U')
         if 'user.email' in str(e):
-            return errors.response(f'{BP_ID}{func_id}9')
+            return errors.response(f'{BP_ID}{func_id}9E')
 
     return jsonify({}), 200
 
@@ -146,12 +151,12 @@ def follow(user_id, func_id=3):
         return errors.response(f'{BP_ID}{func_id}2')
     
     follower = User.query.get(follower)
-    follower.follows.append(followee)
 
-    try:
-        db.session.commit()
-    except IntegrityError:
+    if followee in follower.follows:
         return errors.response(f'{BP_ID}{func_id}3')
+    
+    follower.follows.append(followee)
+    db.session.commit()
 
     return jsonify({}), 200
 
@@ -175,12 +180,12 @@ def unfollow(user_id, func_id=4):
         return errors.response(f'{BP_ID}{func_id}2')
     
     follower = User.query.get(follower)
-    follower.follows.remove(followee)
 
-    try:
-        db.session.commit()
-    except IntegrityError:
+    if not followee in follower.follows:
         return errors.response(f'{BP_ID}{func_id}3')
+
+    follower.follows.remove(followee)
+    db.session.commit()
 
     return jsonify({}), 200
 
@@ -196,4 +201,4 @@ def get_followed(func_id=5):
     '''
     me = User.query.get(jwt.get_jwt_identity()['id'])
     users = [x.to_dict() for x in me.follows]
-    return jsonify({'users': users}), 200
+    return jsonify({'followed_users': users}), 200

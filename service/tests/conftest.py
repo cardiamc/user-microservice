@@ -91,6 +91,7 @@ def database(app):
         _init_database(db)
         yield db
 
+        db.session.rollback()
         db.drop_all()
         db.session.commit()
 

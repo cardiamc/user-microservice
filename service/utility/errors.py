@@ -24,9 +24,10 @@ EP_DICT = {
     '024': (400, 'Invalid e-mail address'),
     '025': (400, 'Password must be between 8 and 64 characters'),
     '026': (400, 'First and last name must be at max 64 characters'),
-    '027': (400, 'Invalid parameter (accepted parameters: [username, email, password, firstname, lastname, dateofbirth])'),
-    '028': (409, 'This username already exists'),
-    '029': (409, 'This email already exists'),
+    '027': (400, 'Wrong date format (requested: "YYYY-MM-DD")'),
+    '028': (400, 'Invalid parameter (accepted parameters: [username, email, password, firstname, lastname, dateofbirth])'),
+    '029U': (409, 'This username already exists'),
+    '029E': (409, 'This email already exists'),
 
     # Follow
     '031': (400, 'You cannot follow yourself'),

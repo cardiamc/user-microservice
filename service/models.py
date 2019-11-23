@@ -8,10 +8,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from werkzeug.security import check_password_hash, generate_password_hash
 
-DATABASE_NAME = 'sqlite:///users.db'
-
-db = SQLAlchemy()
-
+from service.extensions import db
 
 '''
 Models the "following" relationship as a many-to-many relationship from
