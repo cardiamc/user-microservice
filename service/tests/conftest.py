@@ -15,7 +15,7 @@ from service.app import create_app
 def app():
     db_fd, db_path = tempfile.mkstemp()
     db_url = 'sqlite:///' + db_path
-    app = create_app(config='tests/config_test.py', database=db_url)
+    app = create_app(config='service/tests/config_test.py', database=db_url)
 
     yield app
 
