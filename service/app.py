@@ -3,23 +3,30 @@
 from celery import Celery
 from flask import Flask
 
-from gateway.extensions import db, celery
+from flask_jwt_extended import JWTManager
+
+from service.extensions import db, celery
+from service.api import users, telebot, auth
 
 __all__ = ('create_app', 'create_celery')
 
 # Import blueprints and insert in the list
-BLUEPRINTS = ()
+BLUEPRINTS = (users, telebot, auth)
 
 
-def create_app(config=None, app_name='gateway', blueprints=None):
+def create_app(config=None, app_name='users-service', blueprints=None, database=None):
     app = Flask(app_name)
 
     if config:
         app.config.from_pyfile(config)
 
+    if database is not None:
+        app.config['SQLALCHEMY_DATABASE_URI'] = database
+        
     if blueprints is None:
         blueprints = BLUEPRINTS
 
+    jwt = JWTManager(app)
     create_celery(app)
     build_blueprints(app, blueprints)
     db.init_app(app)
