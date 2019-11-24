@@ -8,12 +8,15 @@ class TestTelebot:
         reply = telebot.register('test1', 1234)
         assert reply.status_code == 200
     
-    def test_register_bot_arg_missing(self, app, client, telebot, database):
+    def test_register_bot_username_missing(self, app, client, telebot, database):
         telebot.client = client
 
         reply = telebot.register('test1', None)
         assert reply.status_code == 400
         assert reply.json['code'] == 'EUS101'
+
+    def test_register_bot_chat_id_missing(self, app, client, telebot, database):
+        telebot.client = client
 
         reply = telebot.register(None, 1234)
         assert reply.status_code == 400
