@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from gateway import create_app, create_celery
+from service import create_app, create_celery
 
 
 app = create_app(config='config.py')

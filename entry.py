@@ -1,4 +1,4 @@
-from gateway.app import create_app
+from service.app import create_app
 
 app = create_app(config='config.py')
 

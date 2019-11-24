@@ -1,4 +1,4 @@
-pidfile = 'gateway.pid'
+pidfile = 'user.pid'
 worker_tmp_dir = '/dev/shm'
 worker_class = 'gthread'
 workers = 2
