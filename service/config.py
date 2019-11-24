@@ -8,7 +8,7 @@ SQLALCHEMY_DATABASE_URI = 'sqlite:///users.db'
 USERS_ENDPOINT = 'localhost:5001'
 STORIES_ENDPOINT = 'localhost:5002'
 REACTIONS_ENDPOINT = 'localhost:5003'
-SEARCH_ENDPOINT = 'localhost:5004'
+STATISTICS_ENDPOINT = 'localhost:5004'
 AUTH_ENDPOINT = 'localhost:5005'
 
 # Celery
