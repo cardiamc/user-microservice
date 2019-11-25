@@ -31,7 +31,11 @@ def create_app(config=None, app_name='users-service', blueprints=None, database=
     build_blueprints(app, blueprints)
     db.init_app(app)
     celery.config_from_object(app.config)
-    db.create_all(app=app)
+    
+    try:
+        db.create_all(app=app)
+    except Exception as e:
+        print("DB already existed")
 
     return app
 
