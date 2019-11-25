@@ -6,11 +6,11 @@ SECRET_KEY = 'change me please'
 
 SQLALCHEMY_DATABASE_URI = 'sqlite:///users.db'
 
-USERS_ENDPOINT = os.get_env('USERS_API', 'localhost:5001')
-STORIES_ENDPOINT = os.get_env('STORIES_API', 'localhost:5002')
-REACTIONS_ENDPOINT = os.get_env('REACTIONS_API', 'localhost:5003')
-STATISTICS_ENDPOINT = os.get_env('STATISTICS_API', 'localhost:5004')
-AUTH_ENDPOINT = os.get_env('AUTH_API', 'localhost:5005')
+USERS_ENDPOINT = os.getenv('USERS_API', 'localhost:5001')
+STORIES_ENDPOINT = os.getenv('STORIES_API', 'localhost:5002')
+REACTIONS_ENDPOINT = os.getenv('REACTIONS_API', 'localhost:5003')
+STATISTICS_ENDPOINT = os.getenv('STATISTICS_API', 'localhost:5004')
+AUTH_ENDPOINT = os.getenv('AUTH_API', 'localhost:5005')
 
 # Celery
 BROKER_TRANSPORT = 'redis'
