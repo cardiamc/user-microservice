@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
+import os
 
 DEBUG = True
 SECRET_KEY = 'change me please'
 
 SQLALCHEMY_DATABASE_URI = 'sqlite:///users.db'
 
-USERS_ENDPOINT = 'localhost:5001'
-STORIES_ENDPOINT = 'localhost:5002'
-REACTIONS_ENDPOINT = 'localhost:5003'
-STATISTICS_ENDPOINT = 'localhost:5004'
-AUTH_ENDPOINT = 'localhost:5005'
+USERS_ENDPOINT = os.get_env('USERS_API', 'localhost:5001')
+STORIES_ENDPOINT = os.get_env('STORIES_API', 'localhost:5002')
+REACTIONS_ENDPOINT = os.get_env('REACTIONS_API', 'localhost:5003')
+STATISTICS_ENDPOINT = os.get_env('STATISTICS_API', 'localhost:5004')
+AUTH_ENDPOINT = os.get_env('AUTH_API', 'localhost:5005')
 
 # Celery
 BROKER_TRANSPORT = 'redis'
