@@ -28,7 +28,6 @@ def users_(func_id=0):
 
 
 @users.route('/users/<user_id>', methods=['GET'])
-@jwt.jwt_required
 def get_user(user_id, func_id=1):
     '''
     Opens the wall of the user with id <user_id>.

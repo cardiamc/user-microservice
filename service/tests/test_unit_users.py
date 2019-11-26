@@ -28,31 +28,22 @@ class TestAllUsers:
 
 class TestGetUser:
 
-    def test_get_user_success(self, app, client, users, database, jwt_token):
+    def test_get_user_success(self, app, client, users, database):
         users.client = client
-        
-        token = jwt_token.create_token(MOCK_TOKEN_IDENTITY)
 
-        reply = users.get_user(token, 2)
+        reply = users.get_user(2)
         assert reply.status_code == 200
 
         get_user_res = User.query.get(2).to_dict()
         assert reply.json['user'] == get_user_res
     
-    def test_get_user_no_user(self, app, client, users, database, jwt_token):
+    def test_get_user_no_user(self, app, client, users, database):
         users.client = client
 
-        token = jwt_token.create_token(MOCK_TOKEN_IDENTITY)
-
-        reply = users.get_user(token, 180)
+        reply = users.get_user(180)
         assert reply.status_code == 404
         assert reply.json['code'] == 'EUS011'
 
-    def test_get_user_no_token(self, app, client, users, database, jwt_token):
-        users.client = client
-
-        reply = users.get_user(None, 2)
-        assert reply.status_code == 401
 
 class TestSignup:
 

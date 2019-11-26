@@ -147,11 +147,8 @@ def users():
                 '/users'
             )
         
-        def get_user(self, token, user_id):
+        def get_user(self, user_id):
             assert self.client is not None
-            if token is not None:
-                self.client.set_cookie(
-                    'localhost', 'access_token_cookie', token)
             return self.client.get(
                 f'/users/{user_id}'
             )
