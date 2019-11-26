@@ -21,5 +21,5 @@ def bot_register(func_id=0):
         db.session.commit()
         return jsonify({}), 200
 
-    return errors.response(f'{BP_ID}{func_id}1')
+    return errors.response(f'{BP_ID}{func_id}2')
 

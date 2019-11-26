@@ -19,7 +19,7 @@ class TestTelebot:
         assert reply.status_code == 400
         assert reply.json['code'] == 'EUS101'
     
-    def register_bot_invalid_user(self, app, client, telebot, database):
+    def test_register_bot_invalid_user(self, app, client, telebot, database):
         telebot.client = client
 
         reply = telebot.register('wrong_user', 1234)
