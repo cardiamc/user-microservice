@@ -6,8 +6,8 @@ celery = Celery()
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
-from utility.telebot_utils import create_bot
-telebot = create_bot()
+#from service.utility.telebot_utils import create_telebot
+#telebot = create_telebot()
 
 from ptbtest import Mockbot
 mockbot = Mockbot()

@@ -43,5 +43,5 @@ def create_telebot():
     dp.add_handler(CommandHandler('start', on_start))
     dp.add_handler(CommandHandler('login', on_login))
     updater.start_polling()
-    
-    return telegram_bot
+
+    return updater

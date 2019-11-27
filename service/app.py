@@ -7,6 +7,7 @@ from flask_jwt_extended import JWTManager
 
 from service.extensions import db, celery
 from service.api import users, auth
+from service.utility.telebot_utils import create_telebot
 
 __all__ = ('create_app', 'create_celery')
 
@@ -32,6 +33,9 @@ def create_app(config=None, app_name='users-service', blueprints=None, database=
     db.init_app(app)
     celery.config_from_object(app.config)
     
+    updater = create_telebot()
+    app.config['TELEGRAM_UPDATER'] = updater
+
     try:
         db.create_all(app=app)
     except Exception:

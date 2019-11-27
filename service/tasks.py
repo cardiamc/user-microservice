@@ -6,7 +6,7 @@ from smtplib import SMTP
 from email.message import EmailMessage
 from service.models import User
 
-from service.extensions import celery, db, telebot
+from service.extensions import celery, db#, telebot
 
 import datetime as dt
 
@@ -54,4 +54,4 @@ def task_request_telegram(story):
     for u in users:
         if int(story['author_id']) in u.follows:
             text = f'Author {story["author_id"]}: {story["text"]}'
-            telegram_bot.send_message(u.telegram_chat_id, text)
+            app.config['TELEGRAM_UPDATER'].bot.send_message(u.telegram_chat_id, text)

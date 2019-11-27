@@ -9,16 +9,17 @@ from flask import jsonify
 import flask_jwt_extended as jwt
 from service.models import User, db
 from service.app import create_app
-
+#from service.extensions import telebot
 
 @pytest.fixture(scope='class')
 def app():
     db_fd, db_path = tempfile.mkstemp()
     db_url = 'sqlite:///' + db_path
     app = create_app(config='service/tests/config_test.py', database=db_url)
-
+   
     yield app
 
+    app.config['TELEGRAM_UPDATER'].stop()
     os.close(db_fd)
     os.unlink(db_path)
 
