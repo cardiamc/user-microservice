@@ -6,12 +6,12 @@ from flask import Flask
 from flask_jwt_extended import JWTManager
 
 from service.extensions import db, celery
-from service.api import users, telebot, auth
+from service.api import users, auth
 
 __all__ = ('create_app', 'create_celery')
 
 # Import blueprints and insert in the list
-BLUEPRINTS = (users, telebot, auth)
+BLUEPRINTS = (users, auth)
 
 
 def create_app(config=None, app_name='users-service', blueprints=None, database=None):
@@ -34,7 +34,7 @@ def create_app(config=None, app_name='users-service', blueprints=None, database=
     
     try:
         db.create_all(app=app)
-    except Exception as e:
+    except Exception:
         print("DB already existed")
 
     return app
