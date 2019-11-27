@@ -1,0 +1,4 @@
+>start celery beat with python3 celery_entry.py beat --loglevel=debug
+>start celery worker with python3 celery_entry.py worker--loglevel=debug
+>you should see beat sending periodic messages
+>you should see worker receiving those messages
