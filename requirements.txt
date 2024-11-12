@@ -1,5 +1,5 @@
 celery==5.2.2
-Flask==1.1.1
+Flask==2.2.5
 redis==3.3.11
 requests==2.32.0
 flask-sqlalchemy
