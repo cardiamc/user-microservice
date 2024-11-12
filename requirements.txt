@@ -1,7 +1,7 @@
 celery==5.2.2
 Flask==1.1.1
 redis==3.3.11
-requests==2.22.0
+requests==2.32.0
 flask-sqlalchemy
 flask-jwt-extended==3.24.1
 gunicorn==22.0.0
